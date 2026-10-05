@@ -1,6 +1,8 @@
 ﻿using ExpenseTracker;
 using ExpenseTracker.IRepository;
 
+
+
 IExpenseService expenseService = new ExpenseService();
 while (true)
 {
@@ -9,7 +11,8 @@ while (true)
     Console.WriteLine("2. View All Expenses");
     Console.WriteLine("3. View Total Expenses");
     Console.WriteLine("4. Remove Expense");
-    Console.WriteLine("5. Exit");
+    Console.WriteLine("5. Totals by Category");
+    Console.WriteLine("6. Exit");
     Console.Write("Choose an option: ");
     var choice = Console.ReadLine();
     switch (choice)
@@ -27,7 +30,11 @@ while (true)
             RemoveExpense(expenseService );
             break;
         case "5":
-            return;
+            ViewTotalsByCategory(expenseService);
+            break;
+        case "6":
+            Environment.Exit(0);
+            break;
         default:
             Console.WriteLine("Invalid option. Please try again.");
             break;
@@ -63,6 +70,7 @@ static void AddExpense(IExpenseService expenseService)
         Category = category.Trim(),
         Date = DateTime.Now
     };
+    
     expenseService.AddExpense(expense);
     Console.WriteLine("Expense added successfully.");
 }
@@ -77,7 +85,7 @@ static void ViewAllExpenses(IExpenseService expenseService)
     Console.WriteLine("All Expenses:");
     foreach (var expense in expenses)
     {
-        Console.WriteLine($"ID: {expense.Id}, Title: {expense.Title}, Amount: {expense.Amount}, Category: {expense.Category}, Date: {expense.Date}");
+        Console.WriteLine($"ID: {expense.Id}, Title: {expense.Title}, Amount: {expense.Amount}, Category: {expense.Category}, Date: {expense.Date:yyyy-MM-dd}");
     }
 }
 static void ViewTotalExpenses(IExpenseService expenseService)
@@ -97,9 +105,25 @@ static void RemoveExpense(IExpenseService expenseService)
     if (expenseService.RemoveExpense(id))
     {
         Console.WriteLine("Expense removed successfully.");
+     
     }
     else
     {
         Console.WriteLine("Expense not found.");
+    }
+    
+}
+static void ViewTotalsByCategory(IExpenseService expenseService)
+{
+    var expensesByCategory = expenseService.GetExpensesByCategory();
+    if (expensesByCategory.Count == 0)
+    {
+        Console.WriteLine("No expenses found.");
+        return;
+    }
+    Console.WriteLine("Expenses by Category:");
+    foreach (var category in expensesByCategory)
+    {
+        Console.WriteLine($"Category: {category.Key}, Total Amount: {category.Value}");
     }
 }
